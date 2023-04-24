@@ -2,3 +2,4 @@ CMakeFiles/*
 .vscode/*
 build/*
 tests.cpp
+poco/
