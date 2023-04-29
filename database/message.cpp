@@ -29,7 +29,7 @@ namespace database
             create_stmt << "CREATE TABLE IF NOT EXISTS `Message` (`id` INT NOT NULL AUTO_INCREMENT,"
                         << "`chat_id` INT NOT NULL,"
                         << "`user_id` INT NOT NULL,"
-                        << "`message` VARCHAR(1024) NOT NULL)";
+                        << "`message` VARCHAR(1024) NOT NULL)",
                 now;
         }
 
@@ -162,6 +162,26 @@ namespace database
     }
 
     const std::string &Message::get_message() const
+    {
+        return _message;
+    }
+
+    long &Message::id()
+    {
+        return _id;
+    }
+
+    long &Message::chat_id()
+    {
+        return _chat_id;
+    }
+
+    long &Message::user_id()
+    {
+        return _user_id;
+    }
+
+    std::string &Message::message()
     {
         return _message;
     }

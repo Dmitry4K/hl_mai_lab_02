@@ -27,7 +27,7 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Statement create_stmt(session);
             create_stmt << "CREATE TABLE IF NOT EXISTS `UserToChat` (`chat_id` INT NOT NULL,"
-                        << "`user_id` INT NOT NULL)";
+                        << "`user_id` INT NOT NULL)",
                 now;
         }
 
@@ -48,8 +48,8 @@ namespace database
     {
         Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
 
-        root->set("id", chat_id);
-        root->set("name", user_id);
+        root->set("id", _chat_id);
+        root->set("name", _user_id);
 
         return root;
     }
@@ -172,6 +172,16 @@ namespace database
     }
 
     long UserToChat::get_user_id() const
+    {
+        return _user_id;
+    }
+
+    long &UserToChat::chat_id()
+    {
+        return _chat_id;
+    }
+
+    long &UserToChat::user_id()
     {
         return _user_id;
     }
