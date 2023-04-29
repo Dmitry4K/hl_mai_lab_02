@@ -29,7 +29,8 @@ namespace database
             create_stmt << "CREATE TABLE IF NOT EXISTS `Message` (`id` INT NOT NULL AUTO_INCREMENT,"
                         << "`chat_id` INT NOT NULL,"
                         << "`user_id` INT NOT NULL,"
-                        << "`message` VARCHAR(1024) NOT NULL)",
+                        << "`message` VARCHAR(1024) NOT NULL,"
+                        << "PRIMARY KEY (`id`))",
                 now;
         }
 
