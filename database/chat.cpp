@@ -1,4 +1,4 @@
-#include "message.h"
+#include "chat.h"
 #include "database.h"
 #include "../config/config.h"
 
@@ -19,17 +19,15 @@ using Poco::Data::Statement;
 namespace database
 {
 
-    void Message::init()
+    void Chat::init()
     {
         try
         {
 
             Poco::Data::Session session = database::Database::get().create_session();
             Statement create_stmt(session);
-            create_stmt << "CREATE TABLE IF NOT EXISTS `Message` (`id` INT NOT NULL AUTO_INCREMENT,"
-                        << "`chat_id` INT NOT NULL,"
-                        << "`user_id` INT NOT NULL,"
-                        << "`message` VARCHAR(1024) NOT NULL)";
+            create_stmt << "CREATE TABLE IF NOT EXISTS `Chat` (`id` INT NOT NULL AUTO_INCREMENT,"
+                        << "`name` VARCHAR(1024) NOT NULL)";
                 now;
         }
 
@@ -46,45 +44,39 @@ namespace database
         }
     }
 
-    Poco::JSON::Object::Ptr Message::toJSON() const
+    Poco::JSON::Object::Ptr Chat::toJSON() const
     {
         Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
 
         root->set("id", _id);
-        root->set("chat_id", _chat_id);
-        root->set("user_id", _user_id);
-        root->set("message", _message);
+        root->set("name", _name);
 
         return root;
     }
 
-    Message Message::fromJSON(const std::string &str)
+    Chat Chat::fromJSON(const std::string &str)
     {
-        Message message;
+        Chat chat;
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(str);
         Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
 
-        message.id() = object->getValue<long>("id");
-        message.chat_id() = object->getValue<long>("chat_id");
-        message.user_id() = object->getValue<long>("user_id");
-        message.message() = object->getValue<std::string>("message");
+        chat.id() = object->getValue<long>("id");
+        chat.name() = object->getValue<std::string>("name");
 
-        return message;
+        return chat;
     }
 
-    std::optional<Message> Message::read_by_id(long id)
+    std::optional<Chat> Chat::read_by_id(long id)
     {
         try
         {
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement select(session);
-            Message a;
-            select << "SELECT id, chat_id, user_id, message FROM Message where id=?",
+            Chat a;
+            select << "SELECT id, name FROM Chat where id=?",
                 into(a._id),
-                into(a._chat_id),
-                into(a._user_id),
-                into(a._message),
+                into(a._name),
                 use(id),
                 range(0, 1); //  iterate over result set one row at a time
 
@@ -106,7 +98,7 @@ namespace database
         return {};
     }
 
-    void Message::save_to_mysql()
+    void Chat::save_to_mysql()
     {
 
         try
@@ -114,11 +106,9 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement insert(session);
 
-            insert << "INSERT INTO Message (id, chat_id, user_id, message) VALUES(?, ?, ?, ?)",
+            insert << "INSERT INTO Chat (id, name) VALUES(?, ?)",
                 use(_id),
-                use(_chat_id),
-                use(_user_id),
-                use(_message);
+                use(_name);
 
             insert.execute();
 
@@ -146,23 +136,13 @@ namespace database
         }
     }
 
-    long Message::get_id() const
+    long Chat::get_id() const
     {
         return _id;
     }
 
-    long Message::get_chat_id() const
+    const std::string &Chat::get_name() const
     {
-        return _chat_id;
-    }
-
-    long Message::get_user_id() const
-    {
-        return _user_id;
-    }
-
-    const std::string &Message::get_message() const
-    {
-        return _message;
+        return _name;
     }
 }

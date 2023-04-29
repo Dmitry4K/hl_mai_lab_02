@@ -39,6 +39,9 @@ using Poco::Util::ServerApplication;
 
 #include "http_request_factory.h"
 #include "../database/user.h"
+#include "../database/chat.h"
+#include "../database/message.h"
+#include "../database/user_to_chat.h"
 
 class HTTPWebServer : public Poco::Util::ServerApplication
 {
@@ -68,6 +71,9 @@ protected:
         if (!_helpRequested)
         {
             database::User::init();
+            database::Chat::init();
+            database::Message::init();
+            database::UserToChat::init();
             ServerSocket svs(Poco::Net::SocketAddress("0.0.0.0", 8080));
             HTTPServer srv(new HTTPRequestFactory(DateTimeFormat::SORTABLE_FORMAT), svs, new HTTPServerParams);
             srv.start();
