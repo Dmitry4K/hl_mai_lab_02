@@ -4,6 +4,7 @@
 
 int main(int argc, char*argv[]) 
 {
+    std::cout << "Started";
     HTTPOtherWebServer app;
     return app.run(argc, argv);
 }

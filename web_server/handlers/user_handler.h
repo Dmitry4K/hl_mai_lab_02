@@ -128,6 +128,8 @@ public:
         HTMLForm form(request, request.stream());
         try
         {
+            // Идет какой-то рандомный набор условий по которому определяется какой метод 
+            // будет выполнен, хотя можно было на каждый метод написать отдельный небольшой хендлер и не тратить на изучение 3 часа
             if (form.has("id") && (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET))
             {
                 long id = atol(form.get("id").c_str());
@@ -280,7 +282,7 @@ public:
         root->set("type", "/errors/not_found");
         root->set("title", "Internal exception");
         root->set("status", Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-        root->set("detail", "request ot found");
+        root->set("detail", "request not found");
         root->set("instance", "/user");
         std::ostream &ostr = response.send();
         Poco::JSON::Stringifier::stringify(root, ostr);

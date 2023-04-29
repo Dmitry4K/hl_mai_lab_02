@@ -57,7 +57,15 @@ public:
         if (hasSubstr(request.getURI(),"/user") ||
             hasSubstr(request.getURI(),"/search") ||
             hasSubstr(request.getURI(),"/auth")) 
-            return new UserHandler(_format);
+            return new UserHandler(_format); // как оказалось UserHandler обрабаывает сразу все три метода...
+
+        // if (uri == "/user") { // TODO сделать нормальные обработчики
+        //     return new UserHandler()
+        // } else if (uri == "/search") {
+        //     return SearchHandler();
+        // } else if (uri == "/search") {
+        //     return AuthHandler();
+        // }
         return 0;
     }
 
