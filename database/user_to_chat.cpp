@@ -42,6 +42,8 @@ namespace database
             std::cout << "statement:" << e.what() << std::endl;
             throw;
         }
+
+        std::cout << "Entity UserToChat initiated";
     }
 
     Poco::JSON::Object::Ptr UserToChat::toJSON() const
