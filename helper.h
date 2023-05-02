@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Poco/Base64Decoder.h"
+#include "Poco/Net/HTTPServerRequest.h"
 #include <istream>
 #include <ostream>
 
@@ -18,4 +19,20 @@ bool get_identity(const std::string identity, std::string &login, std::string &p
     login = decoded.substr(0, pos);
     password = decoded.substr(pos + 1);
     return true;
+}
+
+bool isPost(HTTPServerRequest &request) {
+    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET;
+}
+
+bool isGet() {
+    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST;
+}
+
+bool isPut() {
+    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT;
+}
+
+bool idDelete() {
+    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE:
 }
