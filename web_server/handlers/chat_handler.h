@@ -1,5 +1,5 @@
-#ifndef USEHANDLER_H
-#define USEHANDLER_H
+#ifndef CHATHANDLER_H
+#define CHATHANDLER_H
 
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -43,13 +43,14 @@ using Poco::Util::OptionCallback;
 using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 
-#include "../../database/user.h"
+#include "../../database/chat.h"
+#include "../../database/user_to_chat.h"
 #include "../../helper.h"
 
 class ChatHandler : public HTTPRequestHandler
 {
 public:
-    ChatHandler(const std::string &format)
+    ChatHandler()
     {
     }
 
@@ -59,13 +60,45 @@ public:
         HTMLForm form(request, request.stream());
         try
         {
+            // получить чаты по user_id и получить чат по chat_id
+            // GET /chat?chat_id={chat_id}
+            // GET /chat?user_id={user_id}
             if (isGet(request)) {
+                if (form.has("chat_id")) {
+                    auto chat = database::Chat::read_by_id(atol(form.get("chat_id").c_str()));
+                    if (chat) {
+                        auto jsonChat = chat->toJSON();
+                        ok(response, jsonChat);
+                    } else {
+                        notFound(response, "/chat");
+                    }
+                    return;
+                }
+
+                if (form.has("user_id")) {
+                    auto users_to_chats = database::UserToChat::read_chats_by_user_id(atol(form.get("user_id").c_str()));
+                    auto content = Poco::JSON::Object::Ptr();
+                    
+                    Poco::JSON::Array arr;
+                    for (auto s : users_to_chats)
+                        arr.add(s.toJSON());
+                    content->set("chats", arr);
+                    ok(response, content);
+                    return;
+                }
+
+                badRequest(response, "/chat", "do not have valid parameters");
                 return;
-            } else if (isPost(request)) {
+            }
+            // POST /chat
+            if (isPost(request)) { // создать чат
                 return;
-            } else if (isPut(request)) {
-                return;
-            } else if (isDelete(request)) {
+            }
+            // PUT /chat?chat_id={chat_id}
+            if (isPut(request)) { // обновить чат по chat_id
+                if (form.has("chat_id")) {
+
+                }
                 return;
             }
         }
@@ -73,17 +106,7 @@ public:
         {
         }
 
-        response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-        response.setChunkedTransferEncoding(true);
-        response.setContentType("application/json");
-        Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-        root->set("type", "/errors/not_found");
-        root->set("title", "Internal exception");
-        root->set("status", Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-        root->set("detail", "request not found");
-        root->set("instance", "/user");
-        std::ostream &ostr = response.send();
-        Poco::JSON::Stringifier::stringify(root, ostr);
+        notFound(response, "/chat");
     }
 };
 #endif

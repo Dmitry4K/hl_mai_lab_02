@@ -1,4 +1,6 @@
 #include "user_to_chat.h"
+#include "user.h"
+#include "chat.h"
 #include "database.h"
 #include "../config/config.h"
 
@@ -69,53 +71,27 @@ namespace database
         return user_to_chat;
     }
 
-    std::optional<UserToChat> UserToChat::read_by_chat_id(long id)
+
+    std::vector<Chat> UserToChat::read_chats_by_user_id(long user_id)
     {
         try
         {
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement select(session);
-            UserToChat a;
-            select << "SELECT chat_id, user_id FROM UserToChat where chat_id=?",
-                into(a._chat_id),
-                into(a._user_id),
-                use(id),
+            std::vector<Chat> result;
+            Chat a;
+            select << "SELECT DISTINCT Chat.id, Chat.name FROM Chat INNER JOIN UserToChat ON Chat.id = UserToChat.chat_id WHERE UserToChat.user_id=?",
+                into(a.id()),
+                into(a.name()),
+                use(user_id),
                 range(0, 1); //  iterate over result set one row at a time
 
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return a;
-        }
-
-        catch (Poco::Data::MySQL::ConnectionException &e)
-        {
-            std::cout << "connection:" << e.what() << std::endl;
-        }
-        catch (Poco::Data::MySQL::StatementException &e)
-        {
-
-            std::cout << "statement:" << e.what() << std::endl;
-            
-        }
-        return {};
-    }
-
-    std::optional<UserToChat> UserToChat::read_by_user_id(long id)
-    {
-        try
-        {
-            Poco::Data::Session session = database::Database::get().create_session();
-            Poco::Data::Statement select(session);
-            UserToChat a;
-            select << "SELECT chat_id, user_id FROM UserToChat where user_id=?",
-                into(a._chat_id),
-                into(a._user_id),
-                use(id),
-                range(0, 1); //  iterate over result set one row at a time
-
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return a;
+            while (!select.done())
+            {
+                if (select.execute())
+                    result.push_back(a);
+            }
+            return result;
         }
 
         catch (Poco::Data::MySQL::ConnectionException &e)

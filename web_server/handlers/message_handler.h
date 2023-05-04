@@ -1,5 +1,5 @@
-#ifndef USEHANDLER_H
-#define USEHANDLER_H
+#ifndef MESSAGEHANDLER_H
+#define MESSAGEHANDLER_H
 
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -43,13 +43,13 @@ using Poco::Util::OptionCallback;
 using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 
-#include "../../database/user.h"
+#include "../../database/message.h"
 #include "../../helper.h"
 
-class ChatHandler : public HTTPRequestHandler
+class MessageHandler : public HTTPRequestHandler
 {
 public:
-    ChatHandler(const std::string &format)
+    MessageHandler()
     {
     }
 
@@ -73,17 +73,7 @@ public:
         {
         }
 
-        response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-        response.setChunkedTransferEncoding(true);
-        response.setContentType("application/json");
-        Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-        root->set("type", "/errors/not_found");
-        root->set("title", "Internal exception");
-        root->set("status", Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-        root->set("detail", "request not found");
-        root->set("instance", "/user");
-        std::ostream &ostr = response.send();
-        Poco::JSON::Stringifier::stringify(root, ostr);
+        badRequest(response, "/message");
     }
 };
 #endif

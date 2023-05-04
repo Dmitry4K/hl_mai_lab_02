@@ -14,6 +14,7 @@ namespace database
 			long _chat_id;
 			long _user_id;
 			std::string _message;
+            
 
         public:
 

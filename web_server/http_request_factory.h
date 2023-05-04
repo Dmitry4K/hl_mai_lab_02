@@ -39,6 +39,8 @@ using Poco::Util::OptionCallback;
 using Poco::Util::HelpFormatter;
 
 #include "handlers/user_handler.h"
+#include "handlers/chat_handler.h"
+#include "handlers/message_handler.h"
 
 
 class HTTPRequestFactory: public HTTPRequestHandlerFactory
@@ -54,18 +56,17 @@ public:
     {
 
         std::cout << "request:" << request.getURI()<< std::endl;
-        if (hasSubstr(request.getURI(),"/user") ||
-            hasSubstr(request.getURI(),"/search") ||
-            hasSubstr(request.getURI(),"/auth")) 
-            return new UserHandler(_format); // как оказалось UserHandler обрабаывает сразу все три метода...
-
-        // if (uri == "/user") { // TODO сделать нормальные обработчики
-        //     return new UserHandler()
-        // } else if (uri == "/search") {
-        //     return SearchHandler();
-        // } else if (uri == "/search") {
-        //     return AuthHandler();
-        // }
+        if (contains(request.getURI(),"/user") ||
+            contains(request.getURI(),"/search") ||
+            contains(request.getURI(),"/auth")) { 
+            return new UserHandler(_format);
+        }
+        if (contains(request.getURI(), "/chat")) {
+            return new ChatHandler();
+        }
+        if (contains(request.getURI(), "/message")) {
+            return new MessageHandler();
+        }
         return 0;
     }
 

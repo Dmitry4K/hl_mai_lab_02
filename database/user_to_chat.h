@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "Poco/JSON/Object.h"
+#include "chat.h"
 #include <optional>
 
 namespace database
@@ -24,8 +25,7 @@ namespace database
             long&        user_id();
 
             static void init();
-            static std::optional<UserToChat> read_by_chat_id(long id);
-            static std::optional<UserToChat> read_by_user_id(long id);
+            static std::vector<Chat> read_chats_by_user_id(long user_id);
             static std::optional<long> auth(std::string &login, std::string &password);
             void save_to_mysql();
 
