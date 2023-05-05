@@ -43,9 +43,9 @@ using Poco::Util::OptionCallback;
 using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 
-#include "../../database/chat.h"
-#include "../../database/user_to_chat.h"
-#include "../../helper.h"
+#include "../../../database/chat.h"
+#include "../../../database/user_to_chat.h"
+#include "../../../helper.h"
 
 class ChatHandler : public HTTPRequestHandler
 {
