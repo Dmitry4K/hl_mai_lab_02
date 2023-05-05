@@ -49,7 +49,7 @@ namespace database
             throw;
         }
 
-        std::cout << "Entity User initiated";
+        std::cout << "Entity User initiated\n";
     }
 
     Poco::JSON::Object::Ptr User::toJSON() const

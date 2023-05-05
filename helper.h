@@ -143,6 +143,34 @@ void forbidden(HTTPServerResponse &response, const std::string& type) {
     );
 }
 
+
+
+void internalServerError(HTTPServerResponse &response, const std::string& type) {
+    createReponse(
+        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, 
+        createError(
+            "Internal server Error",
+            "/errors/forbidden",
+            "Internal server Error",
+            type
+        )
+    );
+}
+
+
+
+void internalServerError(HTTPServerResponse &response, const std::string& type, const std::string& msg) {
+    createReponse(
+        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, 
+        createError(
+            "Internal server Error",
+            "/errors/forbidden",
+            msg,
+            type
+        )
+    );
+}
+
 void ok(HTTPServerResponse &response, Poco::JSON::Object::Ptr& content) {
     createReponse(response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK, content);
 }

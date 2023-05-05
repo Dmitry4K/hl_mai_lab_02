@@ -96,18 +96,14 @@ public:
                         forbidden(response, "/chat");
                         return;
                     }
-                    std::cout << 1 << std::endl;
 
                     auto users_to_chats = database::UserToChat::read_chats_by_user_id(query_param_id);
                     Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
-                    std::cout << 1 << std::endl;
                     Poco::JSON::Array::Ptr arr = new Poco::JSON::Array();
                     for (auto s : users_to_chats) {
                         arr->add(s.toJSON());
                     }
-                    std::cout << 1 << std::endl;
                     content->set("chats", arr);
-                    std::cout << 1 << std::endl;
                     ok(response, content);
                     return;
                 }
@@ -116,8 +112,20 @@ public:
                 return;
             }
             // POST /chat
-            if (isPost(request)) { // создать чат
-                return;
+            if (isPost(request) && form.has("chatName")) { // создать чат
+                try {
+                    database::Chat chat;
+                    chat.name() = form.get("chatName");
+                    std::string message;
+                    std::string reason;
+                    Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
+                    chat.save_to_mysql();
+                    content->set("chat_id", chat.get_id());
+                    ok(response, content);
+                } catch (const Poco::Exception& ex) {
+                    std::cout << "Exception: " << ex.what() << std::endl;
+                    internalServerError(response, std::string(ex.what()));
+                }
             }
         }
         catch (...)
