@@ -43,7 +43,7 @@ namespace database
             std::cout << "statement:" << e.what() << std::endl;
             throw;
         }
-        std::cout << "Entity Chat initiated";
+        std::cout << "Entity Chat initiated\n";
     }
 
     Poco::JSON::Object::Ptr Chat::toJSON() const
@@ -108,8 +108,7 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement insert(session);
 
-            insert << "INSERT INTO Chat (id, name) VALUES(?, ?)",
-                use(_id),
+            insert << "INSERT INTO Chat (name) VALUES(?)",
                 use(_name);
 
             insert.execute();
