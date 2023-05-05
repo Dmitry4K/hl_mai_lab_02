@@ -108,6 +108,19 @@ void notFound(HTTPServerResponse &response, const std::string& type) {
     );
 }
 
+void unauthorized(HTTPServerResponse &response, const std::string& type) {
+    createReponse(
+        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_UNAUTHORIZED, 
+        createError(
+            "Unauthorized",
+            "/errors/unauthorized",
+            Poco::Net::HTTPResponse::HTTPStatus::HTTP_UNAUTHORIZED,
+            "Unauthorized",
+            type
+        )
+    );
+}
+
 void ok(HTTPServerResponse &response, Poco::JSON::Object::Ptr& content) {
     createReponse(response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK, content);
 }

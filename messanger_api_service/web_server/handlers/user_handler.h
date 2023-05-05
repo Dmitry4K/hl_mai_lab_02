@@ -49,6 +49,7 @@ using Poco::Util::ServerApplication;
 class UserHandler : public HTTPRequestHandler
 {
 private:
+
     bool check_name(const std::string &name, std::string &reason)
     {
         if (name.length() < 3)
