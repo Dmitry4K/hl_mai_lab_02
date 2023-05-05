@@ -58,115 +58,105 @@ void createReponse(
     }
 
 Poco::JSON::Object::Ptr createError(
-    const std::string& title,
-    const std::string& type,
     const std::string& detail,
-    const std::string& instance
+    const std::string& title
 ) {
     Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-    root->set("type", type);
     root->set("title", title);
     root->set("detail", detail);
-    root->set("instance", instance);
     return root;
 }
 
-void badRequest(HTTPServerResponse &response, const std::string& type) {
+void badRequest(HTTPServerResponse &response) {
     createReponse(
         response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST, 
         createError(
-            "Internal exception",
-            "/errors/bad_request",
-            "bad request",
-            type
+            "Bad request",
+            "/errors/bad_request"
         )
     );
 }
 
-void badRequest(HTTPServerResponse &response, const std::string& type, const std::string& reason) {
+void badRequest(HTTPServerResponse &response, const std::string& reason) {
     createReponse(
-        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND, 
+        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST, 
         createError(
-            "Internal exception",
-            "/errors/bad_request",
             reason,
-            type
+            "/errors/bad_request"
         )
     );
 }
 
-void notFound(HTTPServerResponse &response, const std::string& type) {
+void notFound(HTTPServerResponse &response) {
     createReponse(
         response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND, 
         createError(
-            "Internal exception",
-            "/errors/not_found",
-            "request not found",
-            type
+            "not found",
+            "/errors/not_found"
         )
     );
 }
 
-void notFound(HTTPServerResponse &response, const std::string& type, const std::string& msg) {
+void notFound(HTTPServerResponse &response, const std::string& msg) {
     createReponse(
         response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND, 
         createError(
-            "Internal exception",
-            "/errors/not_found",
             msg,
-            type
+            "/errors/not_found"            
         )
     );
 }
 
-void unauthorized(HTTPServerResponse &response, const std::string& type) {
+void unauthorized(HTTPServerResponse &response) {
     createReponse(
         response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_UNAUTHORIZED, 
         createError(
             "Unauthorized",
-            "/errors/unauthorized",
-            "Unauthorized",
-            type
+            "/errors/unauthorized"
         )
     );
 }
 
-void forbidden(HTTPServerResponse &response, const std::string& type) {
+void forbidden(HTTPServerResponse &response) {
     createReponse(
         response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_FORBIDDEN, 
         createError(
             "Forbidden",
-            "/errors/forbidden",
-            "Forbidden",
-            type
+            "/errors/forbidden"
         )
     );
 }
 
 
 
-void internalServerError(HTTPServerResponse &response, const std::string& type) {
+void internalServerError(HTTPServerResponse &response) {
     createReponse(
         response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, 
         createError(
             "Internal server Error",
-            "/errors/forbidden",
-            "Internal server Error",
-            type
+            "/errors/internal"
         )
     );
 }
 
 
 
-void internalServerError(HTTPServerResponse &response, const std::string& type, const std::string& msg) {
+void internalServerError(HTTPServerResponse &response, const std::string& msg) {
     createReponse(
         response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, 
         createError(
-            "Internal server Error",
-            "/errors/forbidden",
             msg,
-            type
+            "/errors/forbidden"
+        )
+    );
+}
+
+void unprocessableEntity(HTTPServerResponse &response, const std::string& msg) {
+    createReponse(
+        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_UNPROCESSABLE_ENTITY, 
+        createError(
+            msg,
+            "/errors/forbidden"
         )
     );
 }

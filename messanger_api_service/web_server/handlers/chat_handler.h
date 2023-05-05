@@ -67,7 +67,7 @@ public:
         long user_id = authServiceClient().checkAccess(request);
 
         if (user_id == AuthServiceClient::NOT_AUTHORIZED) {
-            unauthorized(response, "/chat");
+            unauthorized(response);
             return;
         }
 
@@ -78,22 +78,29 @@ public:
             // GET /chat?chat_id={chat_id}
             // GET /chat?user_id={user_id}
             if (isGet(request)) {
-                if (contains(request.getURI(), "searchByChatId") && form.has("chatId")) {
+                if (contains(request.getURI(), "searchByChatId")) {
+                    if (!form.has("chatId")) {
+                        badRequest(response, "chatId not exist's");
+                    }
                     auto chatId = atol(form.get("chatId").c_str());
                     auto chat = database::Chat::read_by_id(chatId);
                     if (chat) {
                         auto jsonChat = chat->toJSON();
                         ok(response, jsonChat);
                     } else {
-                        notFound(response, "/chat", "cannot find chat with id " + std::to_string(chatId));
+                        notFound(response, "cannot find chat with id " + std::to_string(chatId));
                     }
                     return;
                 }
 
-                if (contains(request.getURI(), "searchByUserId") && form.has("userId")) {
+                if (contains(request.getURI(), "searchByUserId")) {
+                    if (!form.has("userId")) {
+                        badRequest(response, "userId not exist's");
+                        return;
+                    }
                     long query_param_id = atol(form.get("userId").c_str());
                     if (query_param_id != user_id) {
-                        forbidden(response, "/chat");
+                        forbidden(response);
                         return;
                     }
 
@@ -107,33 +114,57 @@ public:
                     ok(response, content);
                     return;
                 }
-
-                badRequest(response, "/chat", "do not have valid parameters");
-                return;
             }
-            // POST /chat
-            if (isPost(request) && form.has("chatName")) { // создать чат
-                try {
-                    database::Chat chat;
+            
+            if (isPost(request)) { // создать чат
+                if (contains(request.getURI(), "addMember")) {
+                    if (!form.has("chatId") || !form.has("userId")) {
+                        badRequest(response, "do not have valid parameters chatId and userId");
+                        return;
+                    }
+                    long chatId = atol(form.get("chatId").c_str());
+                    long userId = atol(form.get("userId").c_str());
                     database::UserToChat userToChat;
-                    chat.name() = form.get("chatName");
-                    std::string message;
-                    std::string reason;
-                    Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
-                    chat.save_to_mysql();
-                    content->set("chat_id", chat.get_id());
-                    userToChat.chat_id() = chat.get_id();
-                    userToChat.user_id() = user_id;
-                    userToChat.save_to_mysql();
-                    ok(response, content);
-                } catch (const Poco::Exception& ex) {
-                    std::cout << "Exception: " << ex.what() << std::endl;
-                    internalServerError(response, std::string(ex.what()));
+                    userToChat.chat_id() = chatId;
+                    userToChat.user_id() = userId;
+
+                    try {
+                        userToChat.save_to_mysql();
+                        Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
+                        ok(response, content);
+                    } catch (Poco::Exception& ex) {
+                        std::cout << "Exception: " << ex.what() << std::endl;
+                        unprocessableEntity(response, std::string(ex.what()));
+                    }
+                    return;
+                }
+                if(form.has("chatName")) {
+                    try {
+                        database::Chat chat;
+                        database::UserToChat userToChat;
+                        chat.name() = form.get("chatName");
+                        std::string message;
+                        std::string reason;
+                        Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
+                        chat.save_to_mysql();
+                        content->set("chat_id", chat.get_id());
+                        userToChat.chat_id() = chat.get_id();
+                        userToChat.user_id() = user_id;
+                        userToChat.save_to_mysql();
+                        ok(response, content);
+                    } catch (const Poco::Exception& ex) {
+                        std::cout << "Exception: " << ex.what() << std::endl;
+                        internalServerError(response, std::string(ex.what()));
+                    }
+                    return;
                 }
             }
         }
         catch (...)
         {
+            std::cout << "Unexpected error";
+            internalServerError(response);
+            return;
         }
 
         notFound(response, "/chat");

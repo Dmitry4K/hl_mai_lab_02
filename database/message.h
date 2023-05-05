@@ -32,7 +32,7 @@ namespace database
             static void init();
             static std::optional<Message> read_by_id(long id);
             static std::optional<Message> read_by_user_id(long id);
-            static std::optional<Message> read_by_chat_id(long id);
+            static std::vector<Message> read_by_chat_id(long chat_id);
             void save_to_mysql();
 
             Poco::JSON::Object::Ptr toJSON() const;

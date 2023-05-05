@@ -116,8 +116,7 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement insert(session);
 
-            insert << "INSERT INTO Message (id, chat_id, user_id, message) VALUES(?, ?, ?, ?)",
-                use(_id),
+            insert << "INSERT INTO Message (chat_id, user_id, message) VALUES(?, ?, ?)",
                 use(_chat_id),
                 use(_user_id),
                 use(_message);
@@ -186,5 +185,44 @@ namespace database
     std::string &Message::message()
     {
         return _message;
+    }
+
+    
+    std::vector<Message> Message::read_by_chat_id(long chat_id)
+    {
+        try
+        {
+            Poco::Data::Session session = database::Database::get().create_session();
+            Poco::Data::Statement select(session);
+            std::vector<Message> result;
+            Message a;
+
+            select << "SELECT DISTINCT Message.id, Message.name FROM Message WHERE Message.chat_id=?",
+                into(a.id()),
+                into(a.chat_id()),
+                into(a.user_id()),
+                into(a.message()),
+                use(chat_id),
+                range(0, 1); //  iterate over result set one row at a time
+
+            while (!select.done())
+            {
+                if (select.execute())
+                    result.push_back(a);
+            }
+            return result;
+        }
+
+        catch (Poco::Data::MySQL::ConnectionException &e)
+        {
+            std::cout << "connection:" << e.what() << std::endl;
+        }
+        catch (Poco::Data::MySQL::StatementException &e)
+        {
+
+            std::cout << "statement:" << e.what() << std::endl;
+            
+        }
+        return {};
     }
 }

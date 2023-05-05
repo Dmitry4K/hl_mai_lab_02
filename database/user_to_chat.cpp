@@ -29,7 +29,10 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Statement create_stmt(session);
             create_stmt << "CREATE TABLE IF NOT EXISTS `UserToChat` (`chat_id` INT NOT NULL,"
-                        << "`user_id` INT NOT NULL)",
+                        << "`user_id` INT NOT NULL,"
+                        << "PRIMARY KEY(chat_id,user_id),"
+                        << "CONSTRAINT fk_utc_u foreign key (user_id) references User (id),"
+                        << "CONSTRAINT fk_utc_c foreign key (chat_id) references Chat (id))",
                 now;
         }
 
@@ -120,6 +123,7 @@ namespace database
                 use(_user_id);
 
             insert.execute();
+
             std::cout << "inserted: ";
             Poco::JSON::Stringifier::stringify(toJSON(), std::cout);
             std::cout << std::endl;

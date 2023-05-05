@@ -52,28 +52,81 @@ public:
     MessageHandler()
     {
     }
+    AuthServiceClient _auth_service_client;
+
+    AuthServiceClient& authServiceClient() {
+        return _auth_service_client;
+    }
 
     void handleRequest(HTTPServerRequest &request,
                        HTTPServerResponse &response)
     {
+        
+        long user_id = authServiceClient().checkAccess(request);
+
+        if (user_id == AuthServiceClient::NOT_AUTHORIZED) {
+            unauthorized(response);
+            return;
+        }
+
         HTMLForm form(request, request.stream());
         try
         {
+            // получить сообщения
             if (isGet(request)) {
-                return;
-            } else if (isPost(request)) {
-                return;
-            } else if (isPut(request)) {
-                return;
-            } else if (isDelete(request)) {
+                if(!form.has("chatId")) {
+                    badRequest(response);
+                    return;
+                }
+                long chat_id = atol(form.get("chatId").c_str());
+                auto messages = database::Message::read_by_chat_id(chat_id);
+                Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
+                Poco::JSON::Array::Ptr arr = new Poco::JSON::Array();
+                for (auto s : messages) {
+                    arr->add(s.toJSON());
+                }
+                content->set("messages", arr);
+                content->set("chatId", chat_id);
+                ok(response, content);
                 return;
             }
+            // отправить сообщние
+            if (isPost(request)) {
+                if(!form.has("chatId") ||
+                   !form.has("text")) {
+                    badRequest(response);
+                    return;
+                }
+                long chat_id = atol(form.get("chatId").c_str());
+                std::string text = std::string(form.get("text").c_str());
+
+                database::Message message;
+                message.chat_id() = chat_id;
+                message.message() = text;
+                message.user_id() = user_id;
+                std::cout << 1 << std::endl;
+                message.save_to_mysql();
+                std::cout << 1 << std::endl;
+
+                Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
+                std::cout << 1 << std::endl;
+                content->set("id", message.id());
+                std::cout << 1 << std::endl;
+                ok(response, content);
+                return;
+            } 
+            // else if (isPut(request)) {
+            //     return;
+            // } else if (isDelete(request)) {
+            //     return;
+            // }
         }
-        catch (...)
+        catch (Poco::Exception& ex) 
         {
+            internalServerError(response, ex.what());
         }
 
-        badRequest(response, "/message");
+        notFound(response, "/message");
     }
 };
 #endif
