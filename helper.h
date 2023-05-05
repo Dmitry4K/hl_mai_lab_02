@@ -22,11 +22,11 @@ bool get_identity(const std::string identity, std::string &login, std::string &p
 }
 
 bool isPost(HTTPServerRequest &request) {
-    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET;
+    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST;
 }
 
 bool isGet(HTTPServerRequest &request) {
-    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST;
+    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET;
 }
 
 bool isPut(HTTPServerRequest &request) {
