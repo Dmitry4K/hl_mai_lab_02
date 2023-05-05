@@ -78,25 +78,36 @@ public:
             // GET /chat?chat_id={chat_id}
             // GET /chat?user_id={user_id}
             if (isGet(request)) {
-                if (form.has("chat_id")) {
-                    auto chat = database::Chat::read_by_id(atol(form.get("chat_id").c_str()));
+                if (contains(request.getURI(), "searchByChatId") && form.has("chatId")) {
+                    auto chatId = atol(form.get("chatId").c_str());
+                    auto chat = database::Chat::read_by_id(chatId);
                     if (chat) {
                         auto jsonChat = chat->toJSON();
                         ok(response, jsonChat);
                     } else {
-                        notFound(response, "/chat");
+                        notFound(response, "/chat", "cannot find chat with id " + std::to_string(chatId));
                     }
                     return;
                 }
 
-                if (form.has("user_id")) {
-                    auto users_to_chats = database::UserToChat::read_chats_by_user_id(atol(form.get("user_id").c_str()));
-                    auto content = Poco::JSON::Object::Ptr();
-                    
-                    Poco::JSON::Array arr;
-                    for (auto s : users_to_chats)
-                        arr.add(s.toJSON());
+                if (contains(request.getURI(), "searchByUserId") && form.has("userId")) {
+                    long query_param_id = atol(form.get("userId").c_str());
+                    if (query_param_id != user_id) {
+                        forbidden(response, "/chat");
+                        return;
+                    }
+                    std::cout << 1 << std::endl;
+
+                    auto users_to_chats = database::UserToChat::read_chats_by_user_id(query_param_id);
+                    Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
+                    std::cout << 1 << std::endl;
+                    Poco::JSON::Array::Ptr arr = new Poco::JSON::Array();
+                    for (auto s : users_to_chats) {
+                        arr->add(s.toJSON());
+                    }
+                    std::cout << 1 << std::endl;
                     content->set("chats", arr);
+                    std::cout << 1 << std::endl;
                     ok(response, content);
                     return;
                 }
@@ -106,13 +117,6 @@ public:
             }
             // POST /chat
             if (isPost(request)) { // создать чат
-                return;
-            }
-            // PUT /chat?chat_id={chat_id}
-            if (isPut(request)) { // обновить чат по chat_id
-                if (form.has("chat_id")) {
-
-                }
                 return;
             }
         }

@@ -56,15 +56,15 @@ public:
     {
 
         std::cout << "request:" << request.getURI()<< std::endl;
-        if (contains(request.getURI(),"/user") ||
-            contains(request.getURI(),"/search") ||
-            contains(request.getURI(),"/auth")) { 
+        if (startswith(request.getURI(),"/user") ||
+            startswith(request.getURI(),"/search") ||
+            startswith(request.getURI(),"/auth")) { 
             return new UserHandler(_format);
         }
-        if (contains(request.getURI(), "/chat")) {
+        if (startswith(request.getURI(), "/chat")) {
             return new ChatHandler();
         }
-        if (contains(request.getURI(), "/message")) {
+        if (startswith(request.getURI(), "/message")) {
             return new MessageHandler();
         }
         return 0;

@@ -41,6 +41,10 @@ bool contains(const std::string& str, const std::string& substr) {
     return str.find(substr) != std::string::npos;
 }
 
+bool startswith(const std::string& str, const  std::string& substr) {
+    return str.find(substr) == 0;
+}
+
 void createReponse(
     HTTPServerResponse &response,
     Poco::Net::HTTPResponse::HTTPStatus status,
@@ -56,14 +60,12 @@ void createReponse(
 Poco::JSON::Object::Ptr createError(
     const std::string& title,
     const std::string& type,
-    Poco::Net::HTTPResponse::HTTPStatus status,
     const std::string& detail,
     const std::string& instance
 ) {
     Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
     root->set("type", type);
     root->set("title", title);
-    root->set("status", status);
     root->set("detail", detail);
     root->set("instance", instance);
     return root;
@@ -75,7 +77,6 @@ void badRequest(HTTPServerResponse &response, const std::string& type) {
         createError(
             "Internal exception",
             "/errors/bad_request",
-            Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST,
             "bad request",
             type
         )
@@ -88,7 +89,6 @@ void badRequest(HTTPServerResponse &response, const std::string& type, const std
         createError(
             "Internal exception",
             "/errors/bad_request",
-            Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND,
             reason,
             type
         )
@@ -101,8 +101,19 @@ void notFound(HTTPServerResponse &response, const std::string& type) {
         createError(
             "Internal exception",
             "/errors/not_found",
-            Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND,
             "request not found",
+            type
+        )
+    );
+}
+
+void notFound(HTTPServerResponse &response, const std::string& type, const std::string& msg) {
+    createReponse(
+        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND, 
+        createError(
+            "Internal exception",
+            "/errors/not_found",
+            msg,
             type
         )
     );
@@ -114,8 +125,19 @@ void unauthorized(HTTPServerResponse &response, const std::string& type) {
         createError(
             "Unauthorized",
             "/errors/unauthorized",
-            Poco::Net::HTTPResponse::HTTPStatus::HTTP_UNAUTHORIZED,
             "Unauthorized",
+            type
+        )
+    );
+}
+
+void forbidden(HTTPServerResponse &response, const std::string& type) {
+    createReponse(
+        response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_FORBIDDEN, 
+        createError(
+            "Forbidden",
+            "/errors/forbidden",
+            "Forbidden",
             type
         )
     );
