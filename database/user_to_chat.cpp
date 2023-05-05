@@ -52,8 +52,8 @@ namespace database
     {
         Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
 
-        root->set("id", _chat_id);
-        root->set("name", _user_id);
+        root->set("chat_id", _chat_id);
+        root->set("user_id", _user_id);
 
         return root;
     }
@@ -120,16 +120,9 @@ namespace database
                 use(_user_id);
 
             insert.execute();
-
-            Poco::Data::Statement select(session);
-            select << "SELECT LAST_INSERT_ID()",
-                range(0, 1); //  iterate over result set one row at a time
-
-            if (!select.done())
-            {
-                select.execute();
-            }
-            std::cout << "inserted" << std::endl;
+            std::cout << "inserted: ";
+            Poco::JSON::Stringifier::stringify(toJSON(), std::cout);
+            std::cout << std::endl;
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {

@@ -115,12 +115,16 @@ public:
             if (isPost(request) && form.has("chatName")) { // создать чат
                 try {
                     database::Chat chat;
+                    database::UserToChat userToChat;
                     chat.name() = form.get("chatName");
                     std::string message;
                     std::string reason;
                     Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
                     chat.save_to_mysql();
                     content->set("chat_id", chat.get_id());
+                    userToChat.chat_id() = chat.get_id();
+                    userToChat.user_id() = user_id;
+                    userToChat.save_to_mysql();
                     ok(response, content);
                 } catch (const Poco::Exception& ex) {
                     std::cout << "Exception: " << ex.what() << std::endl;
