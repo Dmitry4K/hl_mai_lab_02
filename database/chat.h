@@ -12,6 +12,7 @@ namespace database
         private:
             long _id;
             std::string _name;
+            long _creator_id;
 
         public:
 
@@ -19,9 +20,11 @@ namespace database
 
             long               get_id() const;
             const std::string &get_name() const;
+            long               get_creator_id() const;
 
             long&        id();
             std::string &name();
+            long&        creator_id();
 
             static void init();
             static std::optional<Chat> read_by_id(long id);

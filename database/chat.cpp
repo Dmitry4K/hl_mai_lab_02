@@ -28,7 +28,9 @@ namespace database
             Statement create_stmt(session);
             create_stmt << "CREATE TABLE IF NOT EXISTS `Chat` (`id` INT NOT NULL AUTO_INCREMENT,"
                         << "`name` VARCHAR(1024) NOT NULL,"
-                        << "PRIMARY KEY (`id`))",
+                        << "`creator_id` INT NOT NULL,"
+                        << "PRIMARY KEY (`id`),"
+                        << "CONSTRAINT fk_c_u foreign key (creator_id) references User (id))",
                 now;
         }
 
@@ -108,8 +110,9 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement insert(session);
 
-            insert << "INSERT INTO Chat (name) VALUES(?)",
-                use(_name);
+            insert << "INSERT INTO Chat (name, creator_id) VALUES(?, ?)",
+                use(_name),
+                use(_creator_id);
 
             insert.execute();
 
@@ -155,5 +158,12 @@ namespace database
     std::string &Chat::name()
     {
         return _name;
+    }
+    
+    long Chat::get_creator_id() const {
+        return _creator_id;
+    }
+    long& Chat::creator_id() {
+        return _creator_id;
     }
 }

@@ -143,6 +143,7 @@ public:
                         database::Chat chat;
                         database::UserToChat userToChat;
                         chat.name() = form.get("chatName");
+                        chat.creator_id() = user_id;
                         std::string message;
                         std::string reason;
                         Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
