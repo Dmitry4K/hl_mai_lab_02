@@ -68,6 +68,7 @@ public:
 
         if (user_id == AuthServiceClient::NOT_AUTHORIZED) {
             unauthorized(response, "/chat");
+            return;
         }
 
         HTMLForm form(request, request.stream());
