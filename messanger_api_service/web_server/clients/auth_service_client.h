@@ -7,6 +7,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/URI.h"
 #include <Poco/JSON/Parser.h>
 
@@ -18,50 +19,55 @@ class AuthServiceClient {
     public:
     static const int NOT_AUTHORIZED = -1;
     int checkAccess(HTTPServerRequest &request) {
-        std::string scheme;
-        std::string info;
-        request.getCredentials(scheme, info);
-        std::cout << "scheme: " << scheme << " identity: " << info << std::endl;
+        try {
+            std::string scheme;
+            std::string info;
+            request.getCredentials(scheme, info);
+            
+            std::cout << "scheme: " << scheme << " identity: " << info << std::endl;
 
-        std::string login, password;
-        std::string string_result;
-        if (scheme == "Basic")
-        {
-            try
+            std::string login, password;
+            std::string string_result;
+            if (scheme == "Basic")
             {
-                Poco::URI uri(_auth_service_url);
-                Poco::Net::HTTPClientSession s(uri.getHost(), uri.getPort());
-                Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, uri.toString());
-                request.setVersion(Poco::Net::HTTPMessage::HTTP_1_1);
+                    Poco::URI uri(_auth_service_url);
+                    Poco::Net::HTTPClientSession s(uri.getHost(), uri.getPort());
+                    Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, uri.toString());
+                    request.setVersion(Poco::Net::HTTPMessage::HTTP_1_1);
+                    
+                    s.sendRequest(request);
+
+                    Poco::Net::HTTPResponse response;
+                    std::istream &rs = s.receiveResponse(response);
+                    
+                    while (rs)
+                    {
+                        char c{};
+                        rs.read(&c, 1);
+                        if (rs)
+                            string_result += c;
+                    }
+
+                    if (response.getStatus() != 200)
+                        return NOT_AUTHORIZED;
+
+                    Poco::JSON::Parser parser;
+                    auto result = parser.parse(string_result);
+                    return result.extract<Poco::JSON::Object::Ptr>()->getValue<long>("user_id");
                 
-                s.sendRequest(request);
-
-                Poco::Net::HTTPResponse response;
-                std::istream &rs = s.receiveResponse(response);
-                
-                while (rs)
-                {
-                    char c{};
-                    rs.read(&c, 1);
-                    if (rs)
-                        string_result += c;
-                }
-
-                if (response.getStatus() != 200)
-                    return {};
-
-                Poco::JSON::Parser parser;
-                auto result = parser.parse(string_result);
-                return result.extract<Poco::JSON::Object::Ptr>()->getValue<long>("user_id");
             }
-            catch (Poco::Exception &ex)
-            {
-                std::cout << "exception:" << ex.what() << std::endl;
-                return NOT_AUTHORIZED;
-            }
+            return NOT_AUTHORIZED;
         }
-        
-        return NOT_AUTHORIZED;
+        catch (Poco::Exception &ex)
+        {
+            std::cout << "exception:" << ex.what() << std::endl;
+            return NOT_AUTHORIZED;
+        }
+        catch (...)
+        {
+            std::cout << "Unexpected exception" << std::endl;
+            return NOT_AUTHORIZED;
+        }
     }
 };
 

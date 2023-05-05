@@ -64,17 +64,15 @@ public:
     void handleRequest(HTTPServerRequest &request,
                        HTTPServerResponse &response)
     {
+        long user_id = authServiceClient().checkAccess(request);
+
+        if (user_id == AuthServiceClient::NOT_AUTHORIZED) {
+            unauthorized(response, "/chat");
+        }
+
         HTMLForm form(request, request.stream());
         try
         {
-            long user_id = authServiceClient().checkAccess(request);
-
-            if (user_id == AuthServiceClient::NOT_AUTHORIZED) {
-                unauthorized(response, "/chat");
-            }
-            std::cout << "DONE\n";
-
-
             // получить чаты по user_id и получить чат по chat_id
             // GET /chat?chat_id={chat_id}
             // GET /chat?user_id={user_id}
