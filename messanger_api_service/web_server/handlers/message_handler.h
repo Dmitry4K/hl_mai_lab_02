@@ -45,6 +45,7 @@ using Poco::Util::ServerApplication;
 
 #include "../../../database/message.h"
 #include "../../../helper.h"
+#include "../clients/auth_service_client.h"
 
 class MessageHandler : public HTTPRequestHandler
 {
@@ -104,14 +105,10 @@ public:
                 message.chat_id() = chat_id;
                 message.message() = text;
                 message.user_id() = user_id;
-                std::cout << 1 << std::endl;
                 message.save_to_mysql();
-                std::cout << 1 << std::endl;
 
                 Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
-                std::cout << 1 << std::endl;
                 content->set("id", message.id());
-                std::cout << 1 << std::endl;
                 ok(response, content);
                 return;
             } 
