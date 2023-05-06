@@ -54,6 +54,7 @@ namespace database
 
         root->set("id", _id);
         root->set("name", _name);
+        root->set("creator_id", _creator_id);
 
         return root;
     }
@@ -78,9 +79,10 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement select(session);
             Chat a;
-            select << "SELECT id, name FROM Chat where id=?",
+            select << "SELECT id, name, creator_id FROM Chat where id=?",
                 into(a._id),
                 into(a._name),
+                into(a._creator_id),
                 use(id),
                 range(0, 1); //  iterate over result set one row at a time
 
