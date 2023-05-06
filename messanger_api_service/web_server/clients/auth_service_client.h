@@ -15,11 +15,10 @@ using Poco::Net::HTTPServerRequest;
 
 class AuthServiceClient {
     private:
-        std::string _auth_service_url = "http://messanger-api:8080/auth";
+        std::string _auth_service_url = "http://127.0.0.1:8081/user/auth";
     public:
     static const int NOT_AUTHORIZED = -1;
     int checkAccess(HTTPServerRequest &request) {
-        return 1;
         try {
             std::string scheme;
             std::string info;
@@ -32,15 +31,14 @@ class AuthServiceClient {
             if (scheme == "Basic")
             {
                     Poco::URI uri(_auth_service_url);
+                    uri.addQueryParameter("token", info);
                     Poco::Net::HTTPClientSession s(uri.getHost(), uri.getPort());
                     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, uri.toString());
                     request.setVersion(Poco::Net::HTTPMessage::HTTP_1_1);
                     
                     s.sendRequest(request);
-
                     Poco::Net::HTTPResponse response;
                     std::istream &rs = s.receiveResponse(response);
-                    
                     while (rs)
                     {
                         char c{};
@@ -49,9 +47,10 @@ class AuthServiceClient {
                             string_result += c;
                     }
 
-                    if (response.getStatus() != 200)
+                    if (response.getStatus() != 200) {
+                        std::cout << "Gotten " << response.getStatus() << std::endl;
                         return NOT_AUTHORIZED;
-
+                    }
                     Poco::JSON::Parser parser;
                     auto result = parser.parse(string_result);
                     return result.extract<Poco::JSON::Object::Ptr>()->getValue<long>("user_id");

@@ -45,11 +45,11 @@ services:
     depends_on:
       mai-db-node-ex01:
         condition: service_healthy
-  auth_api:
+  auth-api:
     build:
       context: auth_service
       dockerfile: Dockerfile
-    container_name: auth_api
+    container_name: auth-api
     environment:
       - SERVICE_HOST=my_service
     ports:
