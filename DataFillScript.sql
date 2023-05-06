@@ -1,4 +1,34 @@
 -- Для тестирования подойдут пользователи с 1, 2, 3
+CREATE TABLE IF NOT EXISTS `User` (`id` INT NOT NULL AUTO_INCREMENT,
+                        `first_name` VARCHAR(256) NOT NULL,
+                        `last_name` VARCHAR(256) NOT NULL,
+                        `login` VARCHAR(256) NOT NULL,
+                        `password` VARCHAR(256) NOT NULL,
+                        `email` VARCHAR(256) NULL,
+                        `title` VARCHAR(1024) NULL,
+                        PRIMARY KEY (`id`),KEY `fn` (`first_name`),KEY `ln` (`last_name`));
+
+CREATE TABLE IF NOT EXISTS `Chat` (`id` INT NOT NULL AUTO_INCREMENT,
+                        `name` VARCHAR(1024) NOT NULL,
+                        `creator_id` INT NOT NULL,
+                        PRIMARY KEY (`id`),
+                        CONSTRAINT fk_c_u foreign key (creator_id) references User (id));
+
+
+CREATE TABLE IF NOT EXISTS `Message` (`id` INT NOT NULL AUTO_INCREMENT,
+                        `chat_id` INT NOT NULL,
+                        `user_id` INT NOT NULL,
+                        `message` VARCHAR(1024) NOT NULL,
+                        PRIMARY KEY (`id`));
+
+
+CREATE TABLE IF NOT EXISTS `UserToChat` (`chat_id` INT NOT NULL,
+                        `user_id` INT NOT NULL,
+                        PRIMARY KEY(chat_id,user_id),
+                        CONSTRAINT fk_utc_u foreign key (user_id) references User (id),
+                        CONSTRAINT fk_utc_c foreign key (chat_id) references Chat (id));
+  
+                                                          
 
 insert into User(first_name, last_name, login, password, email, title) values ('name1', 'name1', 'name1', 'name1', 'name1@email.com','name1');
 insert into User(first_name, last_name, login, password, email, title) values ('name2', 'name2', 'name2', 'name2', 'name2@email.com','name2');
