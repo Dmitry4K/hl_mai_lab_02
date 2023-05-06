@@ -193,7 +193,7 @@ paths:
   
   /search:
     get:
-      summary: Поиск пользователей по маске имени и фамилии
+      summary: (СЕРВИС АВТОРИЗАЦИИ) Поиск пользователей по маске имени и фамилии
       parameters:
       - name: first_name
         description: Имя
@@ -228,7 +228,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /auth:
     get:
-      summary: Проверка аутентификации
+      summary: (СЕРВИС АВТОРИЗАЦИИ) Проверка аутентификации
       parameters:
       - name: token
         description: Токен пользователя
@@ -256,7 +256,7 @@ paths:
                 type: string
   /user:
     put:
-      summary: Получение токена для пользователя
+      summary: (СЕРВИС АВТОРИЗАЦИИ) Получение токена для пользователя
       parameters:
       - name: login
         description: Уникальный идентификатор пользователя
@@ -289,7 +289,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Добавление нового пользователя
+      summary: (СЕРВИС АВТОРИЗАЦИИ) Добавление нового пользователя
       parameters:
       - name: first_name
         description: Имя пользователя
