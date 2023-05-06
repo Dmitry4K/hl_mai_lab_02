@@ -99,10 +99,6 @@ public:
                         return;
                     }
                     long query_param_id = atol(form.get("userId").c_str());
-                    if (query_param_id != user_id) {
-                        forbidden(response);
-                        return;
-                    }
 
                     auto users_to_chats = database::UserToChat::read_chats_by_user_id(query_param_id);
                     Poco::JSON::Object::Ptr content = new Poco::JSON::Object();
