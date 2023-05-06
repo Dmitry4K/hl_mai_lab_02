@@ -15,7 +15,7 @@ using Poco::Net::HTTPServerRequest;
 
 class AuthServiceClient {
     private:
-        std::string _auth_service_url = "http://127.0.0.1:8081/user/auth";
+        std::string _auth_service_url = "http://" + std::string(std::getenv("AUTH_API_HOST")) + ":8081/user/auth";
     public:
     static const int NOT_AUTHORIZED = -1;
     int checkAccess(HTTPServerRequest &request) {
