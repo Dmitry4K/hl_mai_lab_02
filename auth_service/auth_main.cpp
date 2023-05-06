@@ -1,10 +1,10 @@
 
 #include <optional>
-#include "http_other_server.h"
+#include "http_auth_server.h"
 
 int main(int argc, char*argv[]) 
 {
     std::cout << "Started";
-    HTTPOtherWebServer app;
+    HTTPAuthWebServer app;
     return app.run(argc, argv);
 }

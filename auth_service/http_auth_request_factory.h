@@ -1,5 +1,5 @@
-#ifndef HTTPREQUESTFACTORY_H
-#define HTTPREQUESTFACTORY_H
+#ifndef HTTPAUTHREQUESTFACTORY_H
+#define HTTPAUTHREQUESTFACTORY_H
 
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -38,30 +38,19 @@ using Poco::Util::OptionSet;
 using Poco::Util::OptionCallback;
 using Poco::Util::HelpFormatter;
 
-#include "handlers/chat_handler.h"
-#include "handlers/message_handler.h"
+#include "auth_handler.h"
 
-
-class HTTPRequestFactory: public HTTPRequestHandlerFactory
+class HTTPAuthRequestFactory : public HTTPRequestHandlerFactory
 {
 public:
-    HTTPRequestFactory(const std::string& format):
-        _format(format)
+    HTTPAuthRequestFactory(const std::string &format) : _format(format)
     {
     }
 
-    HTTPRequestHandler* createRequestHandler(
-        const HTTPServerRequest& request)
+    HTTPRequestHandler *createRequestHandler([[maybe_unused]] const HTTPServerRequest &request)
     {
 
-        std::cout << "request:" << request.getURI()<< std::endl;
-        if (startswith(request.getURI(), "/chat")) {
-            return new ChatHandler();
-        }
-        if (startswith(request.getURI(), "/message")) {
-            return new MessageHandler();
-        }
-        return 0;
+        return new AuthHandler();
     }
 
 private:
