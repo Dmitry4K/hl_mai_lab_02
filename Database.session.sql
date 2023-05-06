@@ -1,1 +1,1 @@
-SELECT id, chat_id, user_id, message FROM Message WHERE Message.chat_id=1
+SELECT * FROM Chat
