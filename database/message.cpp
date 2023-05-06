@@ -197,7 +197,7 @@ namespace database
             std::vector<Message> result;
             Message a;
 
-            select << "SELECT DISTINCT Message.id, Message.name FROM Message WHERE Message.chat_id=?",
+            select << "SELECT id, chat_id, user_id, message FROM Message WHERE Message.chat_id=?",
                 into(a.id()),
                 into(a.chat_id()),
                 into(a.user_id()),
